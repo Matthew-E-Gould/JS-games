@@ -5,9 +5,18 @@
   </head>
 
   <body>
-    <input type="button" value="Start Game" onclick="game.setup();"><br>
+
+    <h1>Instructions!</h1>
+    <p>
+      Select the question that you think is wrong,<br>
+      Correct it in the textbox,<br>
+      If you've selected the wrong sum you can reselect :)
+    </p>
+    <hr>
+
+    <input type="button" value="Start Game" onclick="game.setup();" id="startBtn"><br>
     <p id="correctMe"></p>
-    Correct the sum: <input type="text" id="ansBox" placeholder="Type Answer Here"><input type="button" value="Submit Answer" onclick="game.answerQuestion();"><br>
+    Correct the sum: <input type="text" id="ansBox" placeholder="Type Answer Here" disabled><input type="button" value="Submit Answer" id="subBtn" onclick="game.answerQuestion();" disabled><br>
     <hr>
     <div id="questionToUI">
     </div>
@@ -46,6 +55,7 @@
         ///////////////////////
         /// GAME SETUP FUNCTION
         this.setup = function(){
+          document.getElementById("startBtn").disabled = true;
 
           // resetting elements and variables
           var questionDiv = document.getElementById("questionToUI");
@@ -160,6 +170,8 @@
         ///////////////////////////////////
         // SELECTED WRONG EQUATION FUNCTION
         this.selectedWrong = function(id){
+          document.getElementById("subBtn").disabled = false;
+          document.getElementById("ansBox").disabled = false;
           this.decision = this.questionArray[id];
           document.getElementById("correctMe").innerHTML = this.decision[0];
 
@@ -174,6 +186,10 @@
         /////////////////////////
         /// ASK QUESTION FUNCTION
         this.askQuestion = function(){
+
+          document.getElementById("subBtn").disabled = true;
+          document.getElementById("ansBox").disabled = true;
+
           this.askTimeNode = Date.now();
           var questionDiv = document.getElementById("questionToUI");
 
@@ -187,6 +203,9 @@
         }
 
         this.gameOver = function(){
+          document.getElementById("startBtn").disabled = false;
+          document.getElementById("subBtn").disabled = true;
+          document.getElementById("ansBox").disabled = true;
           // game timer stuff
           this.gameEndTime = Date.now();
           totalTime = (this.gameEndTime - this.gameStartTime) / 1000;
