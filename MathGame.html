@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Math Game</title>
+  </head>
+
+  <body>
+    <input type="button" value="Start Game" onclick="game.setup();"><br>
+    Answer: <input type="text" id="ansBox" placeholder="Type Answer Here"><input type="button" value="Submit Answer" onclick="game.answerQuestion();"><br>
+    <hr>
+    <div id="questionToUI">
+    </div>
+
+
+    <script>
+      function Game(questionCount){
+        // stores time relating to how long game lasted
+        this.gameStartTime = 0;
+        this.gameEndTime = 0;
+
+        // stores info for timing each question
+        this.askTimeNode = 0;
+        this.ansTimeNode = 0;
+
+        // stores info relating to the fastest answered question
+        this.fastestTime = 999999999;
+        this.fastestAns = "";
+
+        // stores info relating to the slowest answered question
+        this.slowestTime = 0;
+        this.slowestAns = "";
+
+        // stores info relating to the total score
+        this.questionsCorrect = 0;
+        this.incorrectQuestions = [];
+
+        // stores info relating to qestion count
+        this.totalQuestions = questionCount;
+        this.currentQuestion = 0;
+        this.questionArray = [];
+
+        /////////////////////// done?
+        /// GAME SETUP FUNCTION
+        this.setup = function(){
+
+          // resetting elements and variables
+          var questionDiv = document.getElementById("questionToUI");
+          questionDiv.innerHTML = "";
+
+          this.askTimeNode = 0;
+          this.ansTimeNode = 0;
+          this.fastestTime = 999999999;
+          this.slowestTime = 0;
+          this.questionsCorrect = 0;
+          this.incorrectQuestions = [];
+          this.currentQuestion = 0;
+
+          // resetting questions that are to be asked
+          this.questionArray = [];
+          for (i = 0; i < this.totalQuestions; i++) {
+            num1 = Math.floor((Math.random() * 100) + 1);
+            num2 = Math.floor((Math.random() * 100) + 1);
+            qType = Math.floor(Math.random() * 2); // 0 +, 1 -, 2 *, 3 /
+            tempQuestion = [num1, num2, qType];
+            this.questionArray.push(tempQuestion);
+          }
+
+          var inputBox = document.getElementById('ansBox');
+          inputBox.focus;
+          inputBox.setActive;
+          inputBox.select();
+
+          this.gameStartTime = Date.now();
+          this.askQuestion();
+        }
+
+        //////////////////////////// done?
+        /// ANSWER QUESTION FUNCTION
+        this.answerQuestion = function(){
+
+          // timer for how long answering took
+          this.ansTimeNode = Date.now();
+          totAnsTime = (this.ansTimeNode - this.askTimeNode)/1000;
+
+          // getting answer and input validation
+          inputAnswer = document.getElementById('ansBox').value;
+          if (isNaN(inputAnswer)) inputAnswer = -999; // if not a number, setting to invalid num
+          else inputAnswer = parseFloat(inputAnswer); // if a number parse it as a float
+
+          questionDetails = this.questionArray[this.currentQuestion];
+          if (questionDetails[2] == 0){ // +
+            calcAnswer = questionDetails[0] + questionDetails[1];
+            tempQu = questionDetails[0] + "+" + questionDetails[1] + "=" + inputAnswer;
+          }
+          else if (questionDetails[2] == 1){ // -
+            calcAnswer = questionDetails[0] - questionDetails[1];
+            tempQu = questionDetails[0] + "-" + questionDetails[1] + "=" + inputAnswer;
+          }
+          else if (questionDetails[2] == 2){ // *
+            calcAnswer = questionDetails[0] * questionDetails[1];
+            tempQu = questionDetails[0] + "*" + questionDetails[1] + "=" + inputAnswer;
+          }
+          else if (questionDetails[2] == 3){ // /
+            calcAnswer = questionDetails[0] / questionDetails[1];
+            tempQu = questionDetails[0] + "/" + questionDetails[1] + "=" + inputAnswer;
+          }
+          else {
+            tempQu = "ANS ERROR: " + questionDetails[2];
+          }
+          correct = (calcAnswer + 0.0001 > inputAnswer && calcAnswer - 0.0001 < inputAnswer) // working out if user answered correctly with a 0.0002 margin of error
+
+          // saving timer results
+          if (totAnsTime < this.fastestTime){
+            this.fastestTime = totAnsTime;
+            this.fastestAns = tempQu;
+            console.log("new fastest time")
+          }
+          if (totAnsTime > this.slowestTime){
+            this.slowestTime = totAnsTime;
+            this.slowestAns = tempQu;
+            console.log("new slowest time")
+          }
+
+          // doing stuff based off if the user answered correctly
+          if (correct) this.questionsCorrect++;
+          else this.incorrectQuestions.push(tempQu + ", Incorrect. Correct Ans: " + calcAnswer);
+
+          // doing stuff for next question
+          this.currentQuestion++;
+          document.getElementById('ansBox').value = "";
+          if(this.currentQuestion < this.totalQuestions) this.askQuestion();
+          else this.gameOver(); // if current question was the last question
+        }
+
+        /////////////////////////
+        /// ASK QUESTION FUNCTION
+        this.askQuestion = function(){
+          this.askTimeNode = Date.now();
+          var questionDiv = document.getElementById("questionToUI");
+
+          var tempQu = document.createElement("p");
+          tempQu.id = "Question_" + this.currentQuestion;
+
+          questionDetails = this.questionArray[this.currentQuestion];
+          if (questionDetails[2] == 0){ // +
+            txt = questionDetails[0] + " + " + questionDetails[1] + " = ";
+          }
+          else if (questionDetails[2] == 1){ // -
+            txt = questionDetails[0] + " - " + questionDetails[1] + " = ";
+          }
+          else if (questionDetails[2] == 2){ // *
+            txt = questionDetails[0] + " X " + questionDetails[1] + " = ";
+          }
+          else if (questionDetails[2] == 3){ // /
+            txt = questionDetails[0] + " / " + questionDetails[1] + " = ";
+          }
+          else {
+            txt = "ASK ERROR: " + questionDetails[2]
+          }
+          tempQu.innerHTML = txt;
+          questionDiv.appendChild(tempQu);
+
+          var inputBox = document.getElementById('ansBox');
+          inputBox.focus;
+          inputBox.setActive;
+          inputBox.select();
+        }
+
+        //////////////////////////
+        // COMPLETED GAME FUNCTION
+        this.gameOver = function(){
+          // game timer stuff
+          this.gameEndTime = Date.now();
+          totalTime = (this.gameEndTime - this.gameStartTime) / 1000;
+
+          // ui stuff
+          var questionDiv = document.getElementById("questionToUI");
+          questionDiv.innerHTML = "";
+
+          var correctOutput = document.createElement("p");
+          correctOutput.innerHTML = "Correct answers: " + this.questionsCorrect + "/" + this.totalQuestions;
+          questionDiv.appendChild(correctOutput);
+
+          var incorrectOutput = document.createElement("p");
+          incorrectOutput.innerHTML = "Incorrect answers: " + this.incorrectQuestions.length + "/" + this.totalQuestions;
+          questionDiv.appendChild(incorrectOutput);
+
+          var totTimerOutput = document.createElement("p");
+          totTimerOutput.innerHTML = "You answered all the questions in " + totalTime + " Seconds"
+          questionDiv.appendChild(totTimerOutput);
+
+          var fastestAnswer = document.createElement("p");
+          fastestAnswer.innerHTML = "Fastest Answer: " + this.fastestAns + ", time: " + this.fastestTime + " Seconds"
+          questionDiv.appendChild(fastestAnswer);
+
+          var slowestAnswer = document.createElement("p");
+          slowestAnswer.innerHTML = "Slowest Answer: " + this.slowestAns + ", time: " + this.slowestTime + " Seconds"
+          questionDiv.appendChild(slowestAnswer);
+
+          var breaker = document.createElement("p");
+          breaker.innerHTML = "<hr>Your incorrect answers:"
+          questionDiv.appendChild(breaker);
+
+          for (tempAns of this.incorrectQuestions) {
+            var tempOutput = document.createElement("p");
+            tempOutput.innerHTML = tempAns;
+            questionDiv.appendChild(tempOutput);
+          }
+        }
+      }
+
+      var inputBox = document.getElementById("ansBox");
+      inputBox.addEventListener("keydown", function (e) {
+        if (e.keyCode === 13) {
+          game.answerQuestion();
+        }
+      });
+
+      var game = new Game(3);
+
+
+    </script>
+
+  </body>
+</html>
