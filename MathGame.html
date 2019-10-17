@@ -11,7 +11,7 @@
     <hr>
 
     <input type="button" value="Start Game" onclick="game.setup();"><br>
-    Answer: <input type="text" id="ansBox" placeholder="Type Answer Here"><input type="button" value="Submit Answer" onclick="game.answerQuestion();"><br>
+    Answer: <input type="text" id="ansBox" placeholder="Type Answer Here" disabled><input type="button" id="subBtn" value="Submit Answer" onclick="game.answerQuestion();" disabled><br>
     <hr>
     <div id="questionToUI">
     </div>
@@ -76,6 +76,10 @@
           inputBox.select();
 
           this.gameStartTime = Date.now();
+
+          document.getElementById("subBtn").disabled = false;
+          document.getElementById("ansBox").disabled = false;
+
           this.askQuestion();
         }
 
@@ -174,6 +178,9 @@
         //////////////////////////
         // COMPLETED GAME FUNCTION
         this.gameOver = function(){
+          document.getElementById("subBtn").disabled = true;
+          document.getElementById("ansBox").disabled = true;
+
           // game timer stuff
           this.gameEndTime = Date.now();
           totalTime = (this.gameEndTime - this.gameStartTime) / 1000;
