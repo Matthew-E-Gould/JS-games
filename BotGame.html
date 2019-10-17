@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <script src="jquery.js"></script>
+    <title>Bot Game</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+
+    <style>
+      #GameScreen {
+        width: 500px;
+        height: 500px;
+        position: relative;
+        background: yellow;
+      }
+      #bot {
+        width: 50px;
+        height: 50px;
+        top: 25px;
+        left: 25px;
+        position: absolute;
+        background-color: grey;
+      }
+    </style>
+
+  </head>
+
+  <body class="container">
+
+    <h1>Instructions!</h1>
+    <p>
+      Give commands to the bot,<br>
+      When You've set out all the commands run the bot,<br>
+      See if it does as you expect!
+    </p>
+    <hr>
+
+    <div class="row">
+      <div class="col-6">
+        <div class="row">
+          <input class="col-6 btn btn-primary" type="button" value="Turn Left" onclick="game.addCMD(0);" disabled>
+          <input class="col-6 btn btn-primary" type="button" value="Turn Right" onclick="game.addCMD(1);" disabled>
+        </div>
+
+        <br>
+
+        <div class="row">
+          <input class="col-6 btn btn-primary" type="button" value="Move Forward" onclick="game.addCMD(2);">
+          <input class="col-6 btn btn-primary" type="button" value="Move Backward" onclick="game.addCMD(3);">
+          <input class="col-6 btn btn-primary" type="button" value="Move Left" onclick="game.addCMD(4);">
+          <input class="col-6 btn btn-primary" type="button" value="Move Right" onclick="game.addCMD(5);">
+        </div>
+
+        <br>
+
+        <div class="row">
+          <input class="col-6 btn btn-primary" type="button" value="Pick Up" onclick="game.addCMD(6);" disabled>
+          <input class="col-6 btn btn-primary" type="button" value="Put Down" onclick="game.addCMD(7);" disabled>
+        </div>
+
+        <br>
+
+        <div class="row">
+          <input class="col-6 btn btn-danger" type="button" value="Delete Last" onclick="game.delLast();">
+          <input class="col-6 btn btn-danger" type="button" value="Clear" onclick="game.clr();">
+          <input id = "runBtn" class="col-12 btn btn-success" type="button" value="Run Bot" onclick="game.run(0);">
+        </div>
+    </div>
+
+    <div id="cmdOut" class="col-6" style="font-family:consolas; color: white; background-color: black;">
+    </div>
+  </div>
+
+    <hr>
+    <div id="GameScreen">
+      <div id="bot"></div>
+    </div>
+
+
+    <script>
+      function Game(){
+        const T_LEFT = 0;
+        const T_RIGHT = 1;
+
+        const M_FORW = 2;
+        const M_BACK = 3;
+        const M_LEFT = 4;
+        const M_RIGHT = 5;
+
+        const P_UP = 6;
+        const P_DOWN = 7;
+
+        this.commands = [];
+
+        this.addCMD = function(cmdID){
+
+          txt = "ERROR";
+          if(cmdID == T_LEFT){
+            txt = "turn left";
+          }
+          else if(cmdID == T_RIGHT){
+            txt = "turn right";
+          }
+          else if(cmdID == M_FORW){
+            txt = "move forward";
+          }
+          else if(cmdID == M_BACK){
+            txt = "move backward";
+          }
+          else if(cmdID == M_LEFT){
+            txt = "move left";
+          }
+          else if(cmdID == M_RIGHT){
+            txt = "move right";
+          }
+          else if(cmdID == P_UP){
+            txt = "pick up";
+          }
+          else if(cmdID == P_DOWN){
+            txt = "put down";
+          }
+          else{
+            // ERROR
+          }
+
+          var tempOutput = document.createElement("div");
+          tempOutput.innerHTML = txt;
+          tempOutput.id = "CMD_" + this.commands.length;
+          tempOutput.style.margin = "0px";
+          document.getElementById("cmdOut").appendChild(tempOutput);
+          this.commands.push(cmdID);
+
+
+        }
+
+        this.delLast = function(){
+          this.commands.pop()
+          var element = document.getElementById("CMD_" + this.commands.length);
+          element.parentNode.removeChild(element);
+        }
+
+        this.clr = function(){
+          document.getElementById("cmdOut").innerHTML = "";
+          this.commands = [];
+        }
+
+        this.run = function(){
+          var elem = document.getElementById("bot");
+          cmdList = this.commands;
+          xPos = 25;
+          yPos = 25;
+          elem.style.top = yPos + "px";
+          elem.style.left = xPos + "px";
+          i = 0;
+          bing = true;
+          pos = 0;
+          var running = setInterval(frame, 500);
+
+          function frame() {
+
+            if(cmdList.length == i) clearInterval(running);
+            else {
+              curCommand = cmdList[i];
+              i++;
+
+              if(curCommand == M_FORW && yPos > 25){
+                yPos -= 100;
+                elem.style.top = yPos + "px";
+              }
+              else if(curCommand == M_BACK && yPos < 425){
+                yPos += 100;
+                elem.style.top = yPos + "px";
+              }
+              else if(curCommand == M_LEFT && xPos > 25){
+                xPos -= 100;
+                elem.style.left = xPos + "px";
+              }
+              else if(curCommand == M_RIGHT && xPos < 425){
+                xPos += 100;
+                elem.style.left = xPos + "px";
+              }
+
+            }
+          }
+        }
+
+      }
+
+      var game = new Game();
+
+
+    </script>
+
+  </body>
+</html>
