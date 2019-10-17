@@ -1,7 +1,6 @@
 <!DOCTYPE html>
 <html>
   <head>
-    <script src="jquery.js"></script>
     <title>Bot Game</title>
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
 
@@ -10,7 +9,7 @@
         width: 500px;
         height: 500px;
         position: relative;
-        background: yellow;
+        background: lime;
       }
       #bot {
         width: 50px;
@@ -19,6 +18,14 @@
         left: 25px;
         position: absolute;
         background-color: grey;
+      }
+      #box {
+        width: 25px;
+        height: 25px;
+        top: 237px;
+        left: 137px;
+        position: absolute;
+        background-color: brown;
       }
     </style>
 
@@ -44,8 +51,8 @@
         <br>
 
         <div class="row">
-          <input class="col-6 btn btn-primary" type="button" value="Move Forward" onclick="game.addCMD(2);">
-          <input class="col-6 btn btn-primary" type="button" value="Move Backward" onclick="game.addCMD(3);">
+          <input class="col-6 btn btn-primary" type="button" value="Move Up" onclick="game.addCMD(2);">
+          <input class="col-6 btn btn-primary" type="button" value="Move Down" onclick="game.addCMD(3);">
           <input class="col-6 btn btn-primary" type="button" value="Move Left" onclick="game.addCMD(4);">
           <input class="col-6 btn btn-primary" type="button" value="Move Right" onclick="game.addCMD(5);">
         </div>
@@ -53,8 +60,8 @@
         <br>
 
         <div class="row">
-          <input class="col-6 btn btn-primary" type="button" value="Pick Up" onclick="game.addCMD(6);" disabled>
-          <input class="col-6 btn btn-primary" type="button" value="Put Down" onclick="game.addCMD(7);" disabled>
+          <input class="col-6 btn btn-primary" type="button" value="Pick Up" onclick="game.addCMD(6);">
+          <input class="col-6 btn btn-primary" type="button" value="Put Down" onclick="game.addCMD(7);">
         </div>
 
         <br>
@@ -73,6 +80,7 @@
     <hr>
     <div id="GameScreen">
       <div id="bot"></div>
+      <div id="box"></div>
     </div>
 
 
@@ -101,10 +109,10 @@
             txt = "turn right";
           }
           else if(cmdID == M_FORW){
-            txt = "move forward";
+            txt = "move up";
           }
           else if(cmdID == M_BACK){
-            txt = "move backward";
+            txt = "move down";
           }
           else if(cmdID == M_LEFT){
             txt = "move left";
@@ -144,14 +152,19 @@
         }
 
         this.run = function(){
-          var elem = document.getElementById("bot");
+          var botElem = document.getElementById("bot");
+          var boxElem = document.getElementById("box");
           cmdList = this.commands;
           xPos = 25;
           yPos = 25;
-          elem.style.top = yPos + "px";
-          elem.style.left = xPos + "px";
+          botElem.style.top = yPos + "px";
+          botElem.style.left = xPos + "px";
+          boxX = 137;
+          boxY = 237;
+          boxElem.style.top = boxY + "px";
+          boxElem.style.left = boxX + "px";
           i = 0;
-          bing = true;
+          gotBox = false;
           pos = 0;
           var running = setInterval(frame, 500);
 
@@ -164,20 +177,43 @@
 
               if(curCommand == M_FORW && yPos > 25){
                 yPos -= 100;
-                elem.style.top = yPos + "px";
+                botElem.style.top = yPos + "px";
+                if (gotBox){
+                  boxY -= 100;
+                  boxElem.style.top = boxY + "px";
+                }
               }
               else if(curCommand == M_BACK && yPos < 425){
                 yPos += 100;
-                elem.style.top = yPos + "px";
+                botElem.style.top = yPos + "px";
+                if (gotBox){
+                  boxY += 100;
+                  boxElem.style.top = boxY + "px";
+                }
               }
               else if(curCommand == M_LEFT && xPos > 25){
                 xPos -= 100;
-                elem.style.left = xPos + "px";
+                botElem.style.left = xPos + "px";
+                if (gotBox){
+                  boxX += 100;
+                  boxElem.style.left = boxX + "px";
+                }
               }
               else if(curCommand == M_RIGHT && xPos < 425){
                 xPos += 100;
-                elem.style.left = xPos + "px";
+                botElem.style.left = xPos + "px";
+                if (gotBox){
+                  boxX += 100;
+                  boxElem.style.left = boxX + "px";
+                }
               }
+              else if(curCommand == P_UP){
+                if (boxX - (xPos+12) == 0 && boxY - (yPos+12) == 0) gotBox = true;
+              }
+              else if(curCommand == P_DOWN){
+                gotBox = false;
+              }
+
 
             }
           }
